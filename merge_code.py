@@ -1,11 +1,14 @@
 import os
 
-# Function to merge files of specific types into one text file
 def merge_files():
     # Prompt user for file types (e.g., py, txt)
     file_types = []
-    file_type = input("Enter the file type (e.g., 'py' for Python files): ").strip()
-    if file_type:
+    file_type = input("Enter the file type (e.g., 'py' for Python files or 'web' for HTML/CSS/JS): ").strip().lower()
+
+    # Automatically add HTML, CSS, and JS if the user selects "web"
+    if file_type == "web":
+        file_types.extend(["html", "css", "js"])
+    elif file_type:
         file_types.append(file_type)
 
     while True:
