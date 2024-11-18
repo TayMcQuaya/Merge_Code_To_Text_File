@@ -1,22 +1,11 @@
 import os
 
 def merge_files():
-    # Prompt user for file types (e.g., py, txt)
-    file_types = []
-    file_type = input("Enter the file type (e.g., 'py' for Python files or 'web' for HTML/CSS/JS): ").strip().lower()
-
-    # Automatically add HTML, CSS, and JS if the user selects "web"
-    if file_type == "web":
-        file_types.extend(["html", "css", "js"])
-    elif file_type:
-        file_types.append(file_type)
-
-    while True:
-        additional_type = input("Do you want any other file types to be included? Type the file type or 'no': ").strip()
-        if additional_type.lower() == 'no':
-            break
-        elif additional_type:
-            file_types.append(additional_type)
+    # Define common programming file types
+    file_types = [
+        "py", "html", "css", "js", "cpp", "c", "java", "rb", "php", "ts",
+        "go", "swift", "kt", "rs", "sh", "bat", "cs", "xml", "json", "yaml", "toml", "ini"
+    ]
 
     # Get the root directory (current working directory)
     root_dir = os.getcwd()
@@ -52,7 +41,10 @@ def merge_files():
             outfile.write(f"# File: {file_name}\n")
             outfile.write(f"# {'='*80}\n\n")
             with open(file_path, "r", encoding="utf-8") as infile:
-                outfile.write(infile.read())
+                try:
+                    outfile.write(infile.read())
+                except UnicodeDecodeError:
+                    print(f"Skipping binary or unreadable file: {file_path}")
                 outfile.write("\n\n")
 
     print(f"Merged files saved to: {output_file_path}")
