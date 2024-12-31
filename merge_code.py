@@ -1,10 +1,10 @@
 import os
 
 def merge_files():
-    # Define common programming file types
+    # Define common programming file types (excluding .json by default)
     file_types = [
-        "py", "html", "css", "js", "cpp", "c", "java", "rb", "php", "ts",
-        "go", "swift", "kt", "rs", "sh", "bat", "cs", "xml", "json", "yaml", "toml", "ini"
+        "py", "html", "css", "cpp", "c", "java", "rb", "php", "ts",
+        "go", "swift", "kt", "rs", "sh", "bat", "cs", "xml", "yaml", "toml", "ini", "tsx", "mjs"
     ]
 
     # Get the root directory (current working directory)
@@ -15,25 +15,44 @@ def merge_files():
     output_file_path = os.path.join(root_dir, output_file_name)
 
     # Define directories and files to ignore
-    ignore_dirs = {"node_modules", "venv", ".git", "__pycache__", "dist", "build"}
-    ignore_file_patterns = {".lock", ".pyc", ".pyo", ".min.js", ".map", "merge_code.py", "merged_files.txt"}
+    ignore_dirs = {"node_modules", "venv", ".git", "__pycache__", "dist", "build", "deps", "dependencies", "vendor"}
+    ignore_file_patterns = {
+        ".lock", ".pyc", ".pyo", ".min.js", ".map", 
+        "merge_code.py", "merged_files.txt", "project_structure.py", "gitauto.py"
+    }
+
+    # Special cases for exceptions
+    include_specific_files = {"package.json"}  # Only include package.json, exclude package-lock.json
 
     # Find all files with the specified extensions
     files_to_merge = []
     for root, dirs, files in os.walk(root_dir):
         # Skip ignored directories
-        dirs[:] = [d for d in dirs if d not in ignore_dirs]
+        dirs[:] = [d for d in dirs if d not in ignore_dirs and not any(dep in d.lower() for dep in ignore_dirs)]
 
         for file in files:
-            if any(file.endswith(f".{ext}") for ext in file_types):
-                if not any(file.endswith(ignored) for ignored in ignore_file_patterns):
-                    files_to_merge.append(os.path.join(root, file))
+            file_path = os.path.join(root, file)
 
+            # Include specific files (e.g., package.json only)
+            if file in include_specific_files:
+                files_to_merge.append(file_path)
+                continue
+
+            # Exclude explicitly ignored filenames
+            if file in {"project_structure.py", "gitauto.py"}:
+                continue
+
+            # Check for other file types, excluding all .json files except the specific ones above
+            if any(file.endswith(f".{ext}") for ext in file_types) and not file.endswith(".json"):
+                if not any(file.endswith(ignored) for ignored in ignore_file_patterns):
+                    files_to_merge.append(file_path)
+
+    # If no matching files found, exit the function
     if not files_to_merge:
         print(f"No files with the specified types ({', '.join(file_types)}) found in {root_dir}.")
         return
 
-    # Merge files into the output file
+    # Merge files into the output file (overwrite if it already exists)
     with open(output_file_path, "w", encoding="utf-8") as outfile:
         for file_path in files_to_merge:
             file_name = os.path.basename(file_path)
