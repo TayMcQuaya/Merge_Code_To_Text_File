@@ -3,7 +3,7 @@ import os
 def merge_files():
     # Define common programming file types (excluding .json by default)
     file_types = [
-        "py", "html", "css", "cpp", "c", "java", "rb", "php", "ts",
+        "py", "html", "css", "cpp", "c", "java", "rb", "php", "ts","js",
         "go", "swift", "kt", "rs", "sh", "bat", "cs", "xml", "yaml", "toml", "ini", "tsx", "mjs"
     ]
 
